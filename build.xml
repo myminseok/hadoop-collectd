@@ -3,11 +3,11 @@
   <property environment="env"/> 
 
   <property name="hadoop.jar" 
-            location="./hadoop-common-0.21.0.jar"/>
+            location="./lib/hadoop-common-0.21.0.jar"/>
   <property name="logging.jar" 
-            location="./commons-logging-1.1.1.jar"/>
+            location="./lib/commons-logging-1.1.1.jar"/>
   <property name="collectd.jar" 
-            location="./jcollectd/collectd.jar"/>
+            location="./lib/jcollectd/collectd.jar"/>
 
   <path id="hd.classpath"> 
     <path location="${hadoop.jar}"/> 
