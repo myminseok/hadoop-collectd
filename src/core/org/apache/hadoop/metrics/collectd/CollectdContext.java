@@ -115,7 +115,7 @@ public class CollectdContext extends AbstractMetricsContext {
   }
 
   private String getType(String context, String name) {
-    return types.getProperty(context + "." + name, DEFAULT_TYPE);
+    return types.getProperty(context + "-" + name, DEFAULT_TYPE);
   }
 
   protected void emitRecord(String contextName,
@@ -123,8 +123,8 @@ public class CollectdContext extends AbstractMetricsContext {
                             OutputRecord outRec)
     throws IOException
   {
-    String context = contextName + "." + recordName;      
-    String plugin = PLUGIN + "." + context;
+    String context = contextName + "-" + recordName;      
+    String plugin = PLUGIN + "_" + context;
 
     for (String name : outRec.getMetricNames()) {
       Number value = outRec.getMetric(name);

@@ -2,14 +2,12 @@
   <property file="${user.home}/.hadoop-collectd-build.properties"/>
   <property environment="env"/> 
 
-  <property name="hadoop"
-            value="../../../hadoop-core-trunk"/>
   <property name="hadoop.jar" 
-            location="${hadoop}/build/hadoop-metrics-0.21.0-dev.jar"/>
+            location="./hadoop-common-0.21.0.jar"/>
   <property name="logging.jar" 
-            location="${hadoop}/build/ivy/lib/Hadoop/common/commons-logging-1.0.4.jar"/>
+            location="./commons-logging-1.1.1.jar"/>
   <property name="collectd.jar" 
-            location="../jcollectd/target/lib/collectd.jar"/>
+            location="./jcollectd/collectd.jar"/>
 
   <path id="hd.classpath"> 
     <path location="${hadoop.jar}"/> 
