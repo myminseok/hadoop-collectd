@@ -42,7 +42,8 @@ import org.collectd.api.ValueList;
  * modified from CollectdContext.java Context for sending metrics to collectd.
  */
 public class CollectdContextConsolidated extends AbstractMetricsContext {
-    private static final Log LOG = LogFactory.getLog(CollectdContextConsolidated.class);
+    private static final Log LOG = LogFactory
+            .getLog(CollectdContextConsolidated.class);
 
     static final String PLUGIN = "hadoop";
     private static final String PERIOD_PROPERTY = "period";
@@ -150,15 +151,15 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                         .loadTypes("hadoop-collectd-types-etc.properties");
                 this.typesConsolidated = this
                         .loadTypesConsolidated("hadoop-collectd-types-consolidated.properties");
-                this.initCollectdRecordsToSend();
+
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < elem.length; i++)
-                    sb.append(elem[i]+"\n");
-                
-                LOG.error("Loading  failed : " + e+" "+sb.toString());
-                
+                    sb.append(elem[i] + "\n");
+
+                LOG.error("Loading  failed : " + e + " " + sb.toString());
+
             }
 
         }
@@ -200,6 +201,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
         try {
+            this.initCollectdRecordsToSend();
             for (String metricName : outRec.getMetricNames()) {
                 Number value = outRec.getMetric(metricName);
                 if (!this.accumulateAsConsolidated(context, contextName,
@@ -214,9 +216,9 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             StackTraceElement[] elem = e.getStackTrace();
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < elem.length; i++)
-                sb.append(elem[i]+"\n");
-            
-            LOG.error("emitRecord  failed : " + e+" "+sb.toString());
+                sb.append(elem[i] + "\n");
+
+            LOG.error("emitRecord  failed : " + e + " " + sb.toString());
         }
     }
 
@@ -305,9 +307,9 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             typedbkey = typedbkeys.next().toString();
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
 
-            LOG.info("CollectdContextConsolidated : dispatchConsolidated:" + typedbkey + ":"
-                    + values);
-            
+            LOG.info("CollectdContextConsolidated : dispatchConsolidated:"
+                    + typedbkey + ":" + values);
+
             // if values is empty, not sends.
             boolean dirty = false;
             for (int i = 0; i < values.size(); i++) {
