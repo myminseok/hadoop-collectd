@@ -42,7 +42,7 @@ import org.collectd.api.ValueList;
  * modified from CollectdContext.java Context for sending metrics to collectd.
  */
 public class CollectdContextConsolidated extends AbstractMetricsContext {
-    private static final Log LOG = LogFactory.getLog(CollectdContext.class);
+    private static final Log LOG = LogFactory.getLog(CollectdContextConsolidated.class);
 
     static final String PLUGIN = "hadoop";
     private static final String PERIOD_PROPERTY = "period";
@@ -152,7 +152,13 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                         .loadTypesConsolidated("hadoop-collectd-types-consolidated.properties");
                 this.initCollectdRecordsToSend();
             } catch (Exception e) {
-                LOG.error("Loading  failed : " + e);
+                StackTraceElement[] elem = e.getStackTrace();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < elem.length; i++)
+                    sb.append(elem[i]+"\n");
+                
+                LOG.error("Loading  failed : " + e+" "+sb.toString());
+                
             }
 
         }
@@ -205,7 +211,12 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             }
             this.dispatchConsolidated();
         } catch (Exception e) {
-            LOG.error("emitRecord  failed : " + e);
+            StackTraceElement[] elem = e.getStackTrace();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < elem.length; i++)
+                sb.append(elem[i]+"\n");
+            
+            LOG.error("emitRecord  failed : " + e+" "+sb.toString());
         }
     }
 
