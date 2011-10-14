@@ -146,7 +146,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             setPeriod(period);
 
             try {
-                this.types = this.loadTypes("hadoop-collectd-types.properties");
+                this.types = this.loadTypes("hadoop-collectd-types-etc.properties");
                 this.typesConsolidated = this
                         .loadTypesConsolidated("hadoop-collectd-types-consolidated.properties");
                 this.initCollectdRecordsToSend();
@@ -189,8 +189,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     protected void emitRecord(String contextName, String recordName,
             OutputRecord outRec) throws IOException {
 
-        String context = contextName + "-" + recordName;
-        String plugin = PLUGIN + "_" + context; // hadoop_dfs_FSNamesystem
+        String context = contextName + "-" + recordName; //dfs-FSNamesystem
+        String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
         for (String metricName : outRec.getMetricNames()) {
             Number value = outRec.getMetric(metricName);
@@ -302,6 +302,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setPlugin(CollectdContextConsolidated.PLUGIN + "_" + typedbkey);
             vl.setValues(values);
             sender.dispatch(vl);
+            LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"+values);
             vl.clearValues();
 
         }
