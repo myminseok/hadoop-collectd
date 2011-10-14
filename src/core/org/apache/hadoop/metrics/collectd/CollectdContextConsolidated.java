@@ -307,8 +307,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             typedbkey = typedbkeys.next().toString();
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
 
-            LOG.info("CollectdContextConsolidated : dispatchConsolidated:"
-                    + typedbkey + ":" + values);
+            //LOG.info("dispatchConsolidated:"
+             //       + typedbkey + ":" + values);
 
             // if values is empty, not sends.
             boolean dirty = false;
@@ -324,9 +324,10 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setPlugin(CollectdContextConsolidated.PLUGIN + "_" + typedbkey);
             vl.setValues(values);
             vl.setType(typedbkey);
+            vl.setTypeInstance("");
             sender.dispatch(vl);
             LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
-                    + values);
+                    + values+"==>"+vl);
             vl.clearValues();
 
         }
