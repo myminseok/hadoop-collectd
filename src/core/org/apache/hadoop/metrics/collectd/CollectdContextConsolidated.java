@@ -323,6 +323,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             }
             vl.setPlugin(CollectdContextConsolidated.PLUGIN + "_" + typedbkey);
             vl.setValues(values);
+            vl.setType(typedbkey);
             sender.dispatch(vl);
             LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
                     + values);
