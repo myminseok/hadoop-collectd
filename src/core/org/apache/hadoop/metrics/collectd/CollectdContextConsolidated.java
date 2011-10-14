@@ -146,7 +146,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             setPeriod(period);
 
             try {
-                this.types = this.loadTypes("hadoop-collectd-types-etc.properties");
+                this.types = this
+                        .loadTypes("hadoop-collectd-types-etc.properties");
                 this.typesConsolidated = this
                         .loadTypesConsolidated("hadoop-collectd-types-consolidated.properties");
                 this.initCollectdRecordsToSend();
@@ -180,7 +181,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         }
         return null;
     }
-    
+
     /**
      * @param contextName dfs, jvm, rpc
      * @param recordName FSNamesystem, namenode, datanode, metrics, jobtracker, datatracker
@@ -189,19 +190,23 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     protected void emitRecord(String contextName, String recordName,
             OutputRecord outRec) throws IOException {
 
-        String context = contextName + "-" + recordName; //dfs-FSNamesystem
+        String context = contextName + "-" + recordName; // dfs-FSNamesystem
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
-        for (String metricName : outRec.getMetricNames()) {
-            Number value = outRec.getMetric(metricName);
-            if (!this.accumulateAsConsolidated(context, contextName,
-                    recordName, metricName, value)) {
-                this.emitAsSingle(plugin, context, contextName, recordName,
-                        metricName, value);
-            }
+        try {
+            for (String metricName : outRec.getMetricNames()) {
+                Number value = outRec.getMetric(metricName);
+                if (!this.accumulateAsConsolidated(context, contextName,
+                        recordName, metricName, value)) {
+                    this.emitAsSingle(plugin, context, contextName, recordName,
+                            metricName, value);
+                }
 
+            }
+            this.dispatchConsolidated();
+        } catch (Exception e) {
+            LOG.error("emitRecord  failed : " + e);
         }
-        this.dispatchConsolidated();
     }
 
     private boolean accumulateAsConsolidated(String typedbkey,
@@ -274,7 +279,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         sender.dispatch(vl);
     }
 
-    private void dispatchConsolidated() {
+    private void dispatchConsolidated() throws Exception {
         ValueList vl = new ValueList();
 
         vl.setTime(System.currentTimeMillis());
@@ -282,12 +287,16 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
         vl.setPluginInstance(instance);
 
-        Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet().iterator();
+        Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet()
+                .iterator();
         String typedbkey = null;
         while (typedbkeys.hasNext()) {
             typedbkey = typedbkeys.next().toString();
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
 
+            LOG.info("CollectdContextConsolidated : dispatchConsolidated:" + typedbkey + ":"
+                    + values);
+            
             // if values is empty, not sends.
             boolean dirty = false;
             for (int i = 0; i < values.size(); i++) {
@@ -302,7 +311,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setPlugin(CollectdContextConsolidated.PLUGIN + "_" + typedbkey);
             vl.setValues(values);
             sender.dispatch(vl);
-            LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"+values);
+            LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
+                    + values);
             vl.clearValues();
 
         }
