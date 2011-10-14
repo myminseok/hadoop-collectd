@@ -148,7 +148,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
             try {
                 this.types = this
-                        .loadTypes("hadoop-collectd-types-etc.properties");
+                        .loadTypes("hadoop-collectd-types.properties");
                 this.typesConsolidated = this
                         .loadTypesConsolidated("hadoop-collectd-types-consolidated.properties");
 
