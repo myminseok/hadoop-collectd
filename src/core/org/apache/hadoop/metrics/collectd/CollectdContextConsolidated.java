@@ -319,11 +319,12 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             if (!dirty) {
                 continue;
             }
-            LOG.info("dispatchConsolidated:"       + typedbkey + ", vl:" + vl);
+          
             vl.setPlugin(CollectdContextConsolidated.PLUGIN + "_" + typedbkey);
             vl.setValues(values);
             vl.setType(typedbkey);
             vl.setTypeInstance("");
+            LOG.info("dispatchConsolidated:"       + typedbkey + ", vl:" + vl);
             sender.dispatch(vl);
             LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
                     + values+"==>"+vl);
