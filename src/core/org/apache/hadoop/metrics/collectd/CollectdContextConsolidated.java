@@ -201,6 +201,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         String typedbkey = contextName + "_" + recordName; // dfs_FSNamesystem
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
+        
         try {
             this.initCollectdRecordsToSend();
             for (String metricName : outRec.getMetricNames()) {
@@ -209,9 +210,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                         recordName, metricName, value)) {
                     this.emitAsSingle(plugin, typedbkey, metricName, value);
                 }
-
             }
-            this.dispatchConsolidated(plugin);
         } catch (Exception e) {
             StackTraceElement[] elem = e.getStackTrace();
             StringBuilder sb = new StringBuilder();
@@ -219,6 +218,16 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 sb.append(elem[i] + "\n");
 
             LOG.error("emitRecord  failed : " + e + " " + sb.toString());
+        }
+        try{
+            this.dispatchConsolidated(plugin);
+        } catch (Exception e) {
+            StackTraceElement[] elem = e.getStackTrace();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < elem.length; i++)
+                sb.append(elem[i] + "\n");
+
+            LOG.error("emitConsolidatedRecord  failed : " + e + " " + sb.toString());
         }
     }
 
