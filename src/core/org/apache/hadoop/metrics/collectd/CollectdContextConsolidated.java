@@ -306,8 +306,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             typedbkey = typedbkeys.next().toString();
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
 
-            //LOG.info("dispatchConsolidated:"
-             //       + typedbkey + ":" + values);
+            LOG.info("dispatchConsolidated:"       + typedbkey + ":" + values);
 
             // if values is empty, not sends.
             boolean dirty = false;
