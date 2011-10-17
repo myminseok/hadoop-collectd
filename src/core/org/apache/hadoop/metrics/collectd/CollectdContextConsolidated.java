@@ -318,8 +318,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             if (!dirty) {
                 continue;
             }
-            if(typedbkey.equals("dfs_namenode") )
-                continue;
+            //if(typedbkey.equals("dfs_namenode") )
+            //    continue;
           
             vl.setType(typedbkey);
             vl.setTypeInstance("");
