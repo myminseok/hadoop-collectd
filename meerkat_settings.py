@@ -17,7 +17,7 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
     'dfs_datanode':{ 
         '_blkChksumOpAvgTm':'blockChecksumOp_avg_time',
         '_blkChksumOpNumOp':'blockChecksumOp_num_ops',
-        '_blkRprtAvgTm':'blockReports_avg_time', 
+        '_blkRprtAvgTm':'blockReports_avg_time',
         '_blkRprtNumOps':'blockReports_num_ops',
         '_blkVerifiFail':'block_verification_failures',
         '_cpyBlkOpAvgTm':'copyBlockOp_avg_time',
@@ -56,14 +56,14 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
         '_memNonHeapCmit':'memNonHeapCommittedM',
         '_threadsTimedWait':'threadsTimedWaiting',
         },
-
-
     'mapred_jobtracker':{
-        #'_occupiedReduceSlot':'occupied_reduce_slots',
-        #'_reservedMapSlots':'reserved_map_slots',
-        #'_reservedReduceSlot':'reserved_reduce_slots',
-        #'_trackersBlacklist':'trackers_blacklisted',
-        #'_trackersDecommiss':'trackers_decommissioned',
+        '_trkerDecomm':'trackers_decommissioned',
+        '_rsvdReduceSlots':'reserved_reduce_slots',
+        '_ocpd_map_slots':'occupied_map_slots',
+        '_blacklistRdcs':'blacklisted_reduces',
+        '_trkerBlacklist':'trackers_blacklisted',
+        '_rsvd_map_slots':'reserved_map_slots',
+        '_ocpdReduceSlots':'occupied_reduce_slots',
      },
      'mapred_shuffleInput':{
         '_shflFailedFetch':'shuffle_failed_fetches',
