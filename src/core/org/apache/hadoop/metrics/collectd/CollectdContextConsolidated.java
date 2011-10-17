@@ -127,7 +127,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             this.collectdRecordsToSend.put(tydbkey, values);
         }
 
-        //LOG.info("collectdRecordsToSend:" + this.collectdRecordsToSend);
+        // LOG.info("collectdRecordsToSend:" + this.collectdRecordsToSend);
 
     }
 
@@ -147,8 +147,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             setPeriod(period);
 
             try {
-                this.types = this
-                        .loadTypes("hadoop-collectd-types.properties");
+                this.types = this.loadTypes("hadoop-collectd-types.properties");
                 this.typesConsolidated = this
                         .loadTypesConsolidated("hadoop-collectd-types-consolidated.properties");
 
@@ -201,7 +200,6 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         String typedbkey = contextName + "_" + recordName; // dfs_FSNamesystem
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
-        
         try {
             this.initCollectdRecordsToSend();
             for (String metricName : outRec.getMetricNames()) {
@@ -219,7 +217,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
             LOG.error("emitRecord  failed : " + e + " " + sb.toString());
         }
-        try{
+        try {
             this.dispatchConsolidated(plugin);
         } catch (Exception e) {
             StackTraceElement[] elem = e.getStackTrace();
@@ -227,7 +225,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             for (int i = 0; i < elem.length; i++)
                 sb.append(elem[i] + "\n");
 
-            LOG.error("emitConsolidatedRecord  failed : " + e + " " + sb.toString());
+            LOG.error("emitConsolidatedRecord  failed : " + e + " "
+                    + sb.toString());
         }
     }
 
@@ -242,10 +241,10 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             values.set(consolidatedTypeIndex, value);
         }
 
-//        LOG.info("formulate: typedbkey:" + typedbkey + ", metricName:"
-//                + metricName + ",value:" + value + "==> " + typedbkey + "["
-//                + consolidatedTypeIndex + "]==>"
-//                + this.collectdRecordsToSend.get(typedbkey));
+        // LOG.info("formulate: typedbkey:" + typedbkey + ", metricName:"
+        // + metricName + ",value:" + value + "==> " + typedbkey + "["
+        // + consolidatedTypeIndex + "]==>"
+        // + this.collectdRecordsToSend.get(typedbkey));
         return (consolidatedTypeIndex >= 0) ? true : false;
     }
 
@@ -271,8 +270,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
-    private void emitAsSingle(String plugin, String typedbkey, String metricName,
-            Number value) {
+    private void emitAsSingle(String plugin, String typedbkey,
+            String metricName, Number value) {
 
         String type = getType(typedbkey, metricName);
         if (type.equals("NONE")) {
@@ -298,7 +297,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setTypeInstance(name);
         vl.addValue(value);
         sender.dispatch(vl);
-        LOG.info("emitMetric : sent ==>"+vl);
+        LOG.info("emitMetric : sent ==>" + vl);
     }
 
     private void dispatchConsolidated(String plugin) throws Exception {
@@ -307,7 +306,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setTime(System.currentTimeMillis());
         vl.setInterval(getPeriod());
         vl.setPlugin(plugin);
-        vl.setPluginInstance(instance);// namenode, secondarynamenode, datanode, jobtracker. tasktracker.
+        vl.setPluginInstance(instance);// namenode, secondarynamenode, datanode, jobtracker.
+                                       // tasktracker.
 
         Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet()
                 .iterator();
@@ -317,38 +317,38 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
 
             // if values is empty, not sends.
-            boolean dirty = false;
+            boolean invalidvalue = false;
             for (int i = 0; i < values.size(); i++) {
-                if (values.get(i) != null) {
-                    dirty = true;
+                if (values.get(i) == null) {
+                    invalidvalue = true;
                     break;
                 }
             }
-            if (!dirty) {
+            if (invalidvalue) {
+                LOG.error("dispatchConsolidated failed  invalid values: :plugin:" + plugin
+                        + ",typedbkey:" + typedbkey + ", values:" + values );
                 continue;
             }
-            //if(typedbkey.equals("dfs_namenode") )
-            //    continue;
-          
+
             vl.setType(typedbkey);
             vl.setTypeInstance("");
             vl.setValues(values);
-            try{
+            try {
                 sender.dispatch(vl);
-                
-                LOG.debug("CollectdContextConsolidated : sent:" + typedbkey + ":" + values+"==>"+vl);
+
+                LOG.debug("CollectdContextConsolidated : sent: typedbkey:" + typedbkey
+                        + ",vl:" + vl);
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < elem.length; i++)
                     sb.append(elem[i] + "\n");
 
-                LOG.error("dispatchConsolidated  failed : " + e +":"+plugin+"/ "   + typedbkey + ", vl:" + vl +" " + sb.toString());
+                LOG.error("dispatchConsolidated:" + e + ":plugin:" + plugin
+                        + ", typedbkey:" + typedbkey + ", vl:" + vl + ", trace:" + sb.toString());
             }
-            
+
             vl.clearValues();
-            
-            
 
         }
     }
