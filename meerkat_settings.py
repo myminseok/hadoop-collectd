@@ -44,13 +44,14 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
         '_UnderReplicaBlks':'UnderReplicatedBlocks',
         },
     'dfs_namenode':{
-        #'_FilesInGetListOps':'FilesInGetListingOps',
-        #'_JourlTXBatchInSync':'JournalTransactionsBatchedInSync',
+        '_FilesInGetLstOps':'FilesInGetListingOps',
+        '_JrnlTXBtchInSync':'JournalTransactionsBatchedInSync',
         '_TX_avg_time':'Transactions_avg_time',
         '_TX_num_ops':'Transactions_num_ops',
         '_blkReportAvgTime':'blockReport_avg_time',
         '_blkReportNumOps':'blockReport_num_ops',
          },
+
     'jvm_metrics':{
         '_memNonHeapCmit':'memNonHeapCommittedM',
         '_threadsTimedWait':'threadsTimedWaiting',
