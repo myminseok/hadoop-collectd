@@ -215,7 +215,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             for (int i = 0; i < elem.length; i++)
                 sb.append(elem[i] + "\n");
 
-            LOG.error("emitRecord  failed : " + e + " " + sb.toString());
+            LOG.error("single Record failed : " + e + " " + sb.toString());
         }
         try {
             this.dispatchConsolidated(plugin);
@@ -225,7 +225,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             for (int i = 0; i < elem.length; i++)
                 sb.append(elem[i] + "\n");
 
-            LOG.error("emitConsolidatedRecord  failed : " + e + " "
+            LOG.error("consolidated Record  failed : " + e + " "
                     + sb.toString());
         }
     }
@@ -325,7 +325,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 }
             }
             if (invalidvalue) {
-                LOG.warn("dispatchConsolidated failed  invalid values: :plugin:" + plugin
+                LOG.warn(" invalid(null) values found, skipping, plugin:" + plugin
                         + ",typedbkey:" + typedbkey + ", values:" + values );
                 continue;
             }
@@ -335,8 +335,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setValues(values);
             try {
                 sender.dispatch(vl);
-
-                LOG.debug("CollectdContextConsolidated : sent: typedbkey:" + typedbkey
+                LOG.debug("sending SUCCESS: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
@@ -344,7 +343,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 for (int i = 0; i < elem.length; i++)
                     sb.append(elem[i] + "\n");
 
-                LOG.error("dispatchConsolidated:" + e + ":plugin:" + plugin
+                LOG.error("sending consolidated record failed:"+ e + ":plugin:" + plugin
                         + ", typedbkey:" + typedbkey + ", vl:" + vl + ", trace:" + sb.toString());
             }
 
