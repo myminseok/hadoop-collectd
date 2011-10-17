@@ -127,7 +127,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             this.collectdRecordsToSend.put(tydbkey, values);
         }
 
-        LOG.info("collectdRecordsToSend:" + this.collectdRecordsToSend);
+        //LOG.info("collectdRecordsToSend:" + this.collectdRecordsToSend);
 
     }
 
