@@ -333,11 +333,22 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setType(typedbkey);
             vl.setTypeInstance("");
             vl.setValues(values);
-            LOG.info("dispatchConsolidated: before sending " +plugin+"/ "   + typedbkey + ", vl:" + vl);
-            sender.dispatch(vl);
-            LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
-                    + values+"==>"+vl);
+            try{
+                sender.dispatch(vl);
+                
+                LOG.debug("CollectdContextConsolidated : sent:" + typedbkey + ":" + values+"==>"+vl);
+            } catch (Exception e) {
+                StackTraceElement[] elem = e.getStackTrace();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < elem.length; i++)
+                    sb.append(elem[i] + "\n");
+
+                LOG.error("dispatchConsolidated  failed : " + e +":"+plugin+"/ "   + typedbkey + ", vl:" + vl +" " + sb.toString());
+            }
+            
             vl.clearValues();
+            
+            
 
         }
     }
