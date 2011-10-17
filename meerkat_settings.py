@@ -17,11 +17,30 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
     'dfs_datanode':{ 
         '_blkChksumOpAvgTm':'blockChecksumOp_avg_time',
         '_blkChksumOpNumOp':'blockChecksumOp_num_ops',
+        '_blkRprtAvgTm':'blockReports_avg_time', 
+        '_blkRprtNumOps':'blockReports_num_ops',
+        '_blkVerifiFail':'block_verification_failures',
+        '_cpyBlkOpAvgTm':'copyBlockOp_avg_time',
+        '_cpyBlkOpNumOps':'copyBlockOp_num_ops',
+        '_heartBeatAvgTm':'heartBeats_avg_time',
+        '_heartBeatsNumOps':'heartBeats_num_ops',
+        '_readBlkOpAvgTm':'readBlockOp_avg_time',
+        '_readBlkOpNumOps':'readBlockOp_num_ops',
+        '_readsFrmLclCli':'reads_from_local_client',
+        '_readFrmRmtCli':'reads_from_remote_client',
+        '_rplcBlkOpAvgTm':'replaceBlockOp_avg_time',
+        '_rplcBlkOpNumOps':'replaceBlockOp_num_ops',
+        '_writeBlkOpAvgTm':'writeBlockOp_avg_time',
+        '_writeBlkOpNumOps':'writeBlockOp_num_ops',
+        '_writesFrmLclCli':'writes_from_local_client',
+        '_writesFrmRmtCli':'writes_from_remote_client',
        },
+                                      
     'dfs_FSNamesystem':{
         '_CapacityRemainGB':'CapacityRemainingGB',
+        '_PendingDelBlks':'PendingDeletionBlocks',
         '_PendingRepliBlks':'PendingReplicationBlocks',
-        '_ScheduledRepliBlks':'ScheduledReplicationBlocks',
+        '_SchedulRepliBlks':'ScheduledReplicationBlocks',
         '_UnderReplicaBlks':'UnderReplicatedBlocks',
         },
     'dfs_namenode':{
@@ -29,13 +48,14 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
         #'_JourlTXBatchInSync':'JournalTransactionsBatchedInSync',
         '_TX_avg_time':'Transactions_avg_time',
         '_TX_num_ops':'Transactions_num_ops',
-        '_blkReport_avg_time':'blockReport_avg_time',
-        '_blkReport_num_ops':'blockReport_num_ops',
+        '_blkReportAvgTime':'blockReport_avg_time',
+        '_blkReportNumOps':'blockReport_num_ops',
          },
     'jvm_metrics':{
-        '_memNonHeapCommitM':'memNonHeapCommittedM',
-        #'threadsTimedWaiting':'threadsTimedWaiting',
+        '_memNonHeapCmit':'memNonHeapCommittedM',
+        '_threadsTimedWait':'threadsTimedWaiting',
         },
+
 
     'mapred_jobtracker':{
         #'_occupiedReduceSlot':'occupied_reduce_slots',
@@ -45,17 +65,18 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
         #'_trackersDecommiss':'trackers_decommissioned',
      },
      'mapred_shuffleInput':{
-        '_shuflFailedFetch':'shuffle_failed_fetches',
-        '_shuflFtchrBsyPcnt':'shuffle_fetchers_busy_percent',
-        '_shuflSuccessFtchs':'shuffle_success_fetches',
+        '_shflFailedFetch':'shuffle_failed_fetches',
+        '_shflFtchrBsyPcnt':'shuffle_fetchers_busy_percent',
+        '_shflInputBytes':'shuffle_input_bytes',
+        '_shflSuccessFtchs':'shuffle_success_fetches',
         },
     'mapred_shuffleOutput':{
-        '_shuflFailedOutput':'shuffle_failed_outputs',
-        '_shuflHndlrBsyPcnt':'shuffle_handler_busy_percent',
-        '_shuflOutputBytes':'shuffle_output_bytes',
-        '_shuflSuccOutput': 'shuffle_success_outputs',
+        '_shflFailedOutput':'shuffle_failed_outputs',
+        '_shflHndlrBsyPcnt':'shuffle_handler_busy_percent',
+        '_shflOutputBytes':'shuffle_output_bytes',
+        '_shflSuccOutput': 'shuffle_success_outputs',
     },
     'mapred_tasktracker':{
-        '_tasksFailedTimeout':'tasks_failed_timeout',
+        '_tasksFailTimeout':'tasks_failed_timeout',
     },
 }
