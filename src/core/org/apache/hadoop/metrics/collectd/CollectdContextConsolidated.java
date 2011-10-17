@@ -288,7 +288,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setType(type);
         vl.setTypeInstance(name);
         vl.addValue(value);
-        sender.dispatch(vl);
+        //sender.dispatch(vl);
         LOG.info("emitMetric : sent ==>"+vl);
     }
 
