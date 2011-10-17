@@ -198,7 +198,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             OutputRecord outRec) throws IOException {
 
         String context = contextName + "-" + recordName; // dfs-FSNamesystem
-        String typedbkey = contextName + "_" + recordName; // dfs-FSNamesystem
+        String typedbkey = contextName + "_" + recordName; // dfs_FSNamesystem
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
         try {
@@ -211,7 +211,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 }
 
             }
-            this.dispatchConsolidated();
+            this.dispatchConsolidated(plugin);
         } catch (Exception e) {
             StackTraceElement[] elem = e.getStackTrace();
             StringBuilder sb = new StringBuilder();
@@ -292,12 +292,12 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         LOG.info("emitMetric : sent ==>"+vl);
     }
 
-    private void dispatchConsolidated() throws Exception {
+    private void dispatchConsolidated(String plugin) throws Exception {
         ValueList vl = new ValueList();
 
         vl.setTime(System.currentTimeMillis());
         vl.setInterval(getPeriod());
-
+        vl.setPlugin(plugin);
         vl.setPluginInstance(instance);// namenode, secondarynamenode, datanode, jobtracker. tasktracker.
 
         Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet()
@@ -321,7 +321,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 continue;
             }
           
-            vl.setPlugin(CollectdContextConsolidated.PLUGIN + "_" + typedbkey);
+            
             vl.setValues(values);
             vl.setType(typedbkey);
             vl.setTypeInstance("");
