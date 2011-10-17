@@ -288,7 +288,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setType(type);
         vl.setTypeInstance(name);
         vl.addValue(value);
-        //sender.dispatch(vl);
+        sender.dispatch(vl);
         LOG.info("emitMetric : sent ==>"+vl);
     }
 
@@ -324,8 +324,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setType(typedbkey);
             vl.setTypeInstance("");
             //LOG.info("dispatchConsolidated:"       + typedbkey + ", vl:" + vl);
-            sender.dispatch(vl);
-            LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
+            //sender.dispatch(vl);
+            //LOG.info("CollectdContextConsolidated : sent:" + typedbkey + ":"
                     + values+"==>"+vl);
             vl.clearValues();
 
