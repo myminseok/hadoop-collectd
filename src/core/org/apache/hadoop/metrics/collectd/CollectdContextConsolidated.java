@@ -190,24 +190,24 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     }
 
     /**
-     * @param contextName dfs, jvm, rpc
-     * @param recordName FSNamesystem, namenode, datanode, metrics, jobtracker, datatracker
+     * @param contextName dfs, jvm, rpc, mapred
+     * @param recordName FSNamesystem, namenode, datanode, metrics, jobtracker, datatracker, shuffleOutput
      * 
      */
     protected void emitRecord(String contextName, String recordName,
             OutputRecord outRec) throws IOException {
 
         String context = contextName + "-" + recordName; // dfs-FSNamesystem
+        String typedbkey = contextName + "_" + recordName; // dfs-FSNamesystem
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
         try {
             this.initCollectdRecordsToSend();
             for (String metricName : outRec.getMetricNames()) {
                 Number value = outRec.getMetric(metricName);
-                if (!this.accumulateAsConsolidated(context, contextName,
+                if (!this.accumulateAsConsolidated(typedbkey, contextName,
                         recordName, metricName, value)) {
-                    this.emitAsSingle(plugin, context, contextName, recordName,
-                            metricName, value);
+                    this.emitAsSingle(plugin, typedbkey, metricName, value);
                 }
 
             }
@@ -262,8 +262,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
-    private void emitAsSingle(String plugin, String typedbkey,
-            String contextName, String recordName, String metricName,
+    private void emitAsSingle(String plugin, String typedbkey, String metricName,
             Number value) {
 
         String type = getType(typedbkey, metricName);
@@ -298,7 +297,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setTime(System.currentTimeMillis());
         vl.setInterval(getPeriod());
 
-        vl.setPluginInstance(instance);
+        vl.setPluginInstance(instance);// namenode, secondarynamenode, datanode, jobtracker. tasktracker.
 
         Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet()
                 .iterator();
