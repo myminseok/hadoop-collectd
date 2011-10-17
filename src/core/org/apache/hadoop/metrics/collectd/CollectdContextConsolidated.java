@@ -325,7 +325,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 }
             }
             if (invalidvalue) {
-                LOG.error("dispatchConsolidated failed  invalid values: :plugin:" + plugin
+                LOG.warn("dispatchConsolidated failed  invalid values: :plugin:" + plugin
                         + ",typedbkey:" + typedbkey + ", values:" + values );
                 continue;
             }
