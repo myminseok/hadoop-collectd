@@ -312,7 +312,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setTypeInstance(name);
         vl.addValue(value);
         sender.dispatch(vl);
-        sender.flush();
+        sender.flush();// important!!! sometimes packets are mixed with previous contents.
         LOG.info("sent single ==>" + vl);
     }
 
