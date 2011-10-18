@@ -1,6 +1,5 @@
 
 '''
-# for hadoop 0.21.0
 renames the contracted column name in rrd to original name  when showing on web.
 following should be copied into meerkat's settings.py
 
@@ -45,6 +44,7 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
         '_UnderReplicaBlks':'UnderReplicatedBlocks',
         },
     'dfs_namenode':{
+                
         '_FilesInGetLstOps':'FilesInGetListingOps',
         '_JrnlTXBtchInSync':'JournalTransactionsBatchedInSync',
         '_TX_avg_time':'Transactions_avg_time',
