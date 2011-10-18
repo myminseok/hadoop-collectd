@@ -130,7 +130,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 //    }
     
     private List<Number> initSingleCollectdRecordToSend(String typedbkey ) throws Exception{
-        List<String> tydbvalues = typesConsolidated.get(tydbkey);
+        List<String> tydbvalues = typesConsolidated.get(typedbkey);
         List<Number> values = new ArrayList<Number>(tydbvalues.size());
         for (int i = 0; i < tydbvalues.size(); i++) {
             values.add(null);
