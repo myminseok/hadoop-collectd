@@ -354,6 +354,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setValues(values);
             try {
                 sender.dispatch(vl);
+                sender.flush();
                 LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
