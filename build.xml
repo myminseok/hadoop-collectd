@@ -7,7 +7,7 @@
   <property name="logging.jar" 
             location="./lib/commons-logging-1.1.1.jar"/>
   <property name="collectd.jar" 
-            location="./lib/jcollectd/collectd.jar"/>
+            location="./lib/jcollectd.jar"/>
 
   <path id="hd.classpath"> 
     <path location="${hadoop.jar}"/> 
