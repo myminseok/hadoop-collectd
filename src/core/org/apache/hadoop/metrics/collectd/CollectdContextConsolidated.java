@@ -254,6 +254,11 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             }
             values.set(consolidatedTypeIndex, value);
         }
+        
+         LOG.info("accumulate: typedbkey:" + typedbkey + ", metricName:"
+         + metricName + ",value:" + value + "==> " + typedbkey + "["
+         + consolidatedTypeIndex + "]==>"
+         + this.collectdRecordsToSend.get(typedbkey));
         return (consolidatedTypeIndex >= 0) ? true : false;
     }
 
