@@ -352,7 +352,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setValues(values);
             try {
                 sender.dispatch(vl);
-                LOG.debug("sending SUCCESS: typedbkey:" + typedbkey
+                LOG.info("sending SUCCESS: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
