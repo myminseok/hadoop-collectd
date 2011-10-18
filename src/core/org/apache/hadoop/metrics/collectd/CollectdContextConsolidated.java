@@ -286,14 +286,14 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     }
 
     private void emitAsSingle(String plugin, String context,
-            String metricName, Number value) {
+            String metricName, Number value) throws IOException{
 
         String type = getType(context, metricName);
         if (type.equals("NONE")) {
             return; // consider disabled
         }
 
-       // emitMetric(plugin, metricName, type, value);
+        emitMetric(plugin, metricName, type, value);
     }
 
     private String getType(String context, String name) {
@@ -301,7 +301,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     }
 
     private void emitMetric(String plugin, String name, String type,
-            Number value) {
+            Number value) throws IOException{
         ValueList vl = new ValueList();
 
         vl.setTime(System.currentTimeMillis());
@@ -311,8 +311,9 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setType(type);
         vl.setTypeInstance(name);
         vl.addValue(value);
-        //sender.dispatch(vl);
-        //LOG.info("sent single ==>" + vl);
+        sender.dispatch(vl);
+        sender.flush();
+        LOG.info("sent single ==>" + vl);
     }
 
     private void dispatchConsolidated(String plugin) throws Exception {
