@@ -52,9 +52,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     private String instance;
     private UdpSender sender;
-    //private UdpSender senderConsolidated;
-  
-    
+
     private Properties types = new Properties();
     private Map<String, List<String>> typesConsolidated = new Hashtable<String, List<String>>();
 
