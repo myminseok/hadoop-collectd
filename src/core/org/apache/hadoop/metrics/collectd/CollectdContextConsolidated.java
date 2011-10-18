@@ -215,7 +215,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 Number value = outRec.getMetric(metricName);
                 if (!this.accumulateAsConsolidated(typedbkey, contextName,
                         recordName, metricName, value)) {
-                    this.emitAsSingle(plugin, typedbkey, metricName, value);
+                    this.emitAsSingle(plugin, context, metricName, value);
                 }
             }
         } catch (Exception e) {
@@ -254,11 +254,11 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             }
             values.set(consolidatedTypeIndex, value);
         }
-        
-         LOG.info("accumulate: typedbkey:" + typedbkey + ", metricName:"
-         + metricName + ",value:" + value + "==> " + typedbkey + "["
-         + consolidatedTypeIndex + "]==>"
-         + this.collectdRecordsToSend.get(typedbkey));
+//        
+//         LOG.debug("accumulate: typedbkey:" + typedbkey + ", metricName:"
+//         + metricName + ",value:" + value + "==> " + typedbkey + "["
+//         + consolidatedTypeIndex + "]==>"
+//         + this.collectdRecordsToSend.get(typedbkey));
         return (consolidatedTypeIndex >= 0) ? true : false;
     }
 
@@ -284,10 +284,10 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
-    private void emitAsSingle(String plugin, String typedbkey,
+    private void emitAsSingle(String plugin, String context,
             String metricName, Number value) {
 
-        String type = getType(typedbkey, metricName);
+        String type = getType(context, metricName);
         if (type.equals("NONE")) {
             return; // consider disabled
         }
@@ -352,7 +352,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setValues(values);
             try {
                 sender.dispatch(vl);
-                LOG.info("sending SUCCESS: typedbkey:" + typedbkey
+                LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
