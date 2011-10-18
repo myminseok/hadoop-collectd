@@ -135,6 +135,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         for (int i = 0; i < tydbvalues.size(); i++) {
             values.add(null);
         }
+        this.collectdRecordsToSend.put(typedbkey, values);
         return values;
         
     }
