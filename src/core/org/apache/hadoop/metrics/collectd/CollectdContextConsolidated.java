@@ -311,7 +311,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setTypeInstance(name);
         vl.addValue(value);
         sender.dispatch(vl);
-        LOG.info("emitMetric : sent ==>" + vl);
+        LOG.info("sent single ==>" + vl);
     }
 
     private void dispatchConsolidated(String plugin) throws Exception {
@@ -351,7 +351,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setTypeInstance("");
             vl.setValues(values);
             try {
-                sender.dispatch(vl);
+                //sender.dispatch(vl);
                 LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
