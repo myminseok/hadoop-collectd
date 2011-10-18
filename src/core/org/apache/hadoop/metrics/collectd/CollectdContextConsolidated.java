@@ -52,6 +52,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     private String instance;
     private UdpSender sender;
+    private UdpSender senderConsolidated;
   
     
     private Properties types = new Properties();
@@ -175,12 +176,15 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         }
         
         sender = new UdpSender();
+        senderConsolidated = new UdpSender();
         List<InetSocketAddress> metricsServers = Util.parse(
                 getAttribute(SERVERS_PROPERTY), Network.DEFAULT_PORT);
 
         for (InetSocketAddress addr : metricsServers) {
             sender.addServer(addr);
+            senderConsolidated.addServer(addr);
         }
+                
 
         instance = defaultInstance();
     }
@@ -312,9 +316,9 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setType(type);
         vl.setTypeInstance(name);
         vl.addValue(value);
-        synchronized(sender){
+        
             sender.dispatch(vl);
-        }
+        
         LOG.info("sent single ==>" + vl);
     }
 
@@ -355,9 +359,9 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setTypeInstance("");
             vl.setValues(values);
             try {
-                synchronized(sender){
-                    sender.dispatch(vl);
-                }
+               
+                senderConsolidated.dispatch(vl);
+                
                 LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
