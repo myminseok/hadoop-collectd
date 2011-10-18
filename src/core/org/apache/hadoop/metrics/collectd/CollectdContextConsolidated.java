@@ -129,7 +129,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 //
 //    }
     
-    private List<Number> initSingleCollectdRecordToSend(String typedbkey ) throws Exception{
+    private List<Number> initSingleCollectdRecordToSend(String typedbkey ){
         List<String> tydbvalues = typesConsolidated.get(typedbkey);
         List<Number> values = new ArrayList<Number>(tydbvalues.size());
         for (int i = 0; i < tydbvalues.size(); i++) {
@@ -226,6 +226,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
             LOG.error("single Record failed : " + e + " " + sb.toString());
         }
+        
         try {
             this.dispatchConsolidated(plugin);
         } catch (Exception e) {
@@ -242,6 +243,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     private boolean accumulateAsConsolidated(String typedbkey,
             String contextName, String recordName, String metricName,
             Number value) {
+       
         int consolidatedTypeIndex = this.lookupIndexFromTypeConsolidated(
                 typedbkey, metricName);
 
@@ -252,11 +254,6 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             }
             values.set(consolidatedTypeIndex, value);
         }
-
-        // LOG.info("formulate: typedbkey:" + typedbkey + ", metricName:"
-        // + metricName + ",value:" + value + "==> " + typedbkey + "["
-        // + consolidatedTypeIndex + "]==>"
-        // + this.collectdRecordsToSend.get(typedbkey));
         return (consolidatedTypeIndex >= 0) ? true : false;
     }
 
