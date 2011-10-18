@@ -44,7 +44,6 @@ HUMAN_READABLE_COLUMN_NAME_MAPPING = {
         '_UnderReplicaBlks':'UnderReplicatedBlocks',
         },
     'dfs_namenode':{
-                
         '_FilesInGetLstOps':'FilesInGetListingOps',
         '_JrnlTXBtchInSync':'JournalTransactionsBatchedInSync',
         '_TX_avg_time':'Transactions_avg_time',
