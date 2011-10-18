@@ -34,9 +34,9 @@ import org.apache.hadoop.metrics.MetricsException;
 import org.apache.hadoop.metrics.spi.AbstractMetricsContext;
 import org.apache.hadoop.metrics.spi.OutputRecord;
 import org.apache.hadoop.metrics.spi.Util;
+import org.collectd.api.ValueList;
 import org.collectd.protocol.Network;
 import org.collectd.protocol.UdpSender;
-import org.collectd.api.ValueList;
 
 /**
  * modified from CollectdContext.java Context for sending metrics to collectd.
@@ -306,7 +306,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     }
 
     private void emitMetric(String plugin, String name, String type,
-            Number value) {
+            Number value) throws IOException{
         ValueList vl = new ValueList();
 
         vl.setTime(System.currentTimeMillis());
@@ -318,6 +318,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.addValue(value);
         
         sender.dispatch(vl);
+        
+        sender.flush();
         
         LOG.info("sent single ==>" + vl);
     }
@@ -360,8 +362,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             vl.setValues(values);
             try {
                
-                //senderConsolidated.dispatch(vl);
-                
+                sender.dispatch(vl);
+                sender.flush();
                 LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
