@@ -313,7 +313,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.addValue(value);
         sender.dispatch(vl);
         sender.flush();
-        LOG.debug("sent single ==>" + vl);
+        LOG.info("sent single ==>" + vl);
     }
 
     private void dispatchConsolidated(String plugin) throws Exception {
@@ -355,7 +355,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             try {
                 sender.dispatch(vl);
                 sender.flush();
-                LOG.debug("sent consolidated: typedbkey:" + typedbkey
+                LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
