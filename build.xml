@@ -29,12 +29,20 @@
   </target> 
  
   <target name="dist" depends="compile"> 
+  	
+  	<mkdir dir="build/classes/META-INF" />
+  	<copy file="types.db"
+  	          tofile="build/classes/META-INF/types.db" />
+  	
+  	
     <jar jarfile="build/hadoop-collectd.jar">
       <fileset dir="." includes="*.properties"/>
-      <fileset dir="." includes="type.db"/>
-      <fileset dir="build/classes" includes="**/*.class"> 
+      <fileset dir="." includes="*.properties"/>
+      <fileset dir="build/classes" includes="**/*.class,**/META-INF/*"> 
         <exclude name="**/test/*"/> 
       </fileset> 
+      
+    	 
     </jar> 
   </target> 
   
