@@ -1,8 +1,12 @@
 git pull origin master
-ant
-cp build/hadoop-collectd.jar /home/nexr/nexr_platforms/meerkat_backend/hadoop-0.21.0
+cd for_hadoop-0.20.2
 
-/home/nexr/nexr_platforms/meerkat_backend/hadoop-0.21.0/bin/stop-all.sh
+hadoop_home=/home/nexr/nexr_platforms/hadoop/hadoop
+ant
+rm -f $hadoop_home/lib/hadoop-collectd.jar
+cp -f ./build/hadoop-collectd.jar $hadoop_home/lib/
+
+$hadoop_home/bin/stop-all.sh
 sleep 1
-/home/nexr/nexr_platforms/meerkat_backend/hadoop-0.21.0/bin/start-all.sh
+$hadoop_home/bin/start-all.sh
 

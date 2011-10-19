@@ -1,0 +1,25 @@
+1) place jar 
+./lib/jcollectd.jar
+./build/hadoop-collectd.jar
+==>
+$hadoop_home/lib/
+
+
+2) edit hadoop-metric.properties
+
+
+# Configuration of the "dfs" context for collectd
+dfs.class=org.apache.hadoop.metrics.collectd.CollectdContextConsolidated
+dfs.period=5
+dfs.servers=$COLLECTD_SERVER_IP:25826
+ 
+# Configuration of the "mapred" context for collectd
+mapred.class=org.apache.hadoop.metrics.collectd.CollectdContextConsolidated
+mapred.period=5
+mapred.servers=$COLLECTD_SERVER_IP:25826
+ 
+# Configuration of the "jvm" context for collectd
+jvm.class=org.apache.hadoop.metrics.collectd.CollectdContextConsolidated
+jvm.period=5
+jvm.servers=$COLLECTD_SERVER_IP:25826
+
