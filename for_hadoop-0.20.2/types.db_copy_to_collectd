@@ -1,4 +1,4 @@
-# for hadoop-0.20.2 
+# for hadoop-0.20.2  2011.11.19
 # this contents should be appended into types.db in collectd/share/collectd/types.db file.
 # column name has been contracted, because collectd limits column name length to 18 characters.
 dfs_FSNamesystem BlockCapacity:GAUGE:0:U, BlocksTotal:GAUGE:0:U, _CapacityRemainGB:GAUGE:0:U, CapacityTotalGB:GAUGE:0:U, CapacityUsedGB:GAUGE:0:U, CorruptBlocks:GAUGE:0:U, ExcessBlocks:GAUGE:0:U, FilesTotal:GAUGE:0:U, MissingBlocks:GAUGE:0:U, _PendingDelBlks:GAUGE:0:U, _PendingRepliBlks:GAUGE:0:U, _SchedulRepliBlks:GAUGE:0:U, TotalLoad:GAUGE:0:U, _UnderReplicaBlks:GAUGE:0:U
