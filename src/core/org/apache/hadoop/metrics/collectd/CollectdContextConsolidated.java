@@ -343,6 +343,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                     break;
                 }
             }
+            if(!typedbkeys.equals("dfs_FSNamesystem"))
+                continue;
             if (includeNull) {
                 LOG.warn(" invalid(null) values found, skipping, plugin:" + plugin
                         + ",typedbkey:" + typedbkey + ", values:" + values );
@@ -355,6 +357,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             try {
                 sender.dispatch(vl);
                 sender.flush();
+                
                 LOG.info("sent consolidated: typedbkey:" + typedbkey
                         + ",vl:" + vl);
             } catch (Exception e) {
