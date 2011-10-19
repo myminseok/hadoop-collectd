@@ -31,6 +31,7 @@
   <target name="dist" depends="compile"> 
     <jar jarfile="build/hadoop-collectd.jar">
       <fileset dir="." includes="*.properties"/>
+      <fileset dir="." includes="type.db"/>
       <fileset dir="build/classes" includes="**/*.class"> 
         <exclude name="**/test/*"/> 
       </fileset> 
