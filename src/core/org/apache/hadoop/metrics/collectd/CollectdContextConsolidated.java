@@ -102,7 +102,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             String[] typelist = value.split(",");
             List<String> list = new ArrayList<String>();
             for (int i = 0; i < typelist.length; i++) {
-                list.add(typelist[i].trim());
+                //list.add(typelist[i].trim());
+                list.add(typelist[i].split(":")[0].trim());
             }
 
             typesConsolidatedLocal.put(key, list);
