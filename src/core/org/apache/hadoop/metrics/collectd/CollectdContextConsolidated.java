@@ -52,7 +52,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     private String instance;
     private UdpSender sender;
-    
+
     private Properties types = new Properties();
     private Map<String, List<String>> typesConsolidated = new Hashtable<String, List<String>>();
 
@@ -102,7 +102,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             String[] typelist = value.split(",");
             List<String> list = new ArrayList<String>();
             for (int i = 0; i < typelist.length; i++) {
-                //list.add(typelist[i].trim());
+                // list.add(typelist[i].trim());
                 list.add(typelist[i].split(":")[0].trim());
             }
 
@@ -115,23 +115,23 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
-//    private void initCollectdRecordsToSend() throws Exception {
-//
-//        Iterator<String> keys = typesConsolidated.keySet().iterator();
-//        while (keys.hasNext()) {
-//            String tydbkey = keys.next().toString();
-//
-//            List<String> tydbvalues = typesConsolidated.get(tydbkey);
-//            List<Number> values = new ArrayList<Number>(tydbvalues.size());
-//            for (int i = 0; i < tydbvalues.size(); i++) {
-//                values.add(null);
-//            }
-//            this.collectdRecordsToSend.put(tydbkey, values);
-//        }
-//
-//    }
-    
-    private List<Number> initSingleCollectdRecordToSend(String typedbkey ){
+    // private void initCollectdRecordsToSend() throws Exception {
+    //
+    // Iterator<String> keys = typesConsolidated.keySet().iterator();
+    // while (keys.hasNext()) {
+    // String tydbkey = keys.next().toString();
+    //
+    // List<String> tydbvalues = typesConsolidated.get(tydbkey);
+    // List<Number> values = new ArrayList<Number>(tydbvalues.size());
+    // for (int i = 0; i < tydbvalues.size(); i++) {
+    // values.add(null);
+    // }
+    // this.collectdRecordsToSend.put(tydbkey, values);
+    // }
+    //
+    // }
+
+    private List<Number> initSingleCollectdRecordToSend(String typedbkey) {
         List<String> tydbvalues = typesConsolidated.get(typedbkey);
         List<Number> values = new ArrayList<Number>(tydbvalues.size());
         for (int i = 0; i < tydbvalues.size(); i++) {
@@ -139,7 +139,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         }
         this.collectdRecordsToSend.put(typedbkey, values);
         return values;
-        
+
     }
 
     public void init(String contextName, ContextFactory factory) {
@@ -212,7 +212,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         String plugin = PLUGIN + "_" + context; // hadoop_dfs-FSNamesystem
 
         try {
-            //this.initCollectdRecordsToSend();
+            // this.initCollectdRecordsToSend();
             for (String metricName : outRec.getMetricNames()) {
                 Number value = outRec.getMetric(metricName);
                 if (!this.accumulateAsConsolidated(typedbkey, contextName,
@@ -228,7 +228,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
             LOG.error("single Record failed : " + e + " " + sb.toString());
         }
-        
+
         try {
             this.dispatchConsolidated(plugin);
         } catch (Exception e) {
@@ -245,22 +245,22 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     private boolean accumulateAsConsolidated(String typedbkey,
             String contextName, String recordName, String metricName,
             Number value) {
-       
+
         int consolidatedTypeIndex = this.lookupIndexFromTypeConsolidated(
                 typedbkey, metricName);
 
         if (consolidatedTypeIndex >= 0) {
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
-            if (values==null || values.isEmpty()){
-               values= this.initSingleCollectdRecordToSend(typedbkey);
+            if (values == null || values.isEmpty()) {
+                values = this.initSingleCollectdRecordToSend(typedbkey);
             }
             values.set(consolidatedTypeIndex, value);
         }
-//        
-//         LOG.debug("accumulate: typedbkey:" + typedbkey + ", metricName:"
-//         + metricName + ",value:" + value + "==> " + typedbkey + "["
-//         + consolidatedTypeIndex + "]==>"
-//         + this.collectdRecordsToSend.get(typedbkey));
+        //
+        // LOG.debug("accumulate: typedbkey:" + typedbkey + ", metricName:"
+        // + metricName + ",value:" + value + "==> " + typedbkey + "["
+        // + consolidatedTypeIndex + "]==>"
+        // + this.collectdRecordsToSend.get(typedbkey));
         return (consolidatedTypeIndex >= 0) ? true : false;
     }
 
@@ -286,8 +286,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
-    private void emitAsSingle(String plugin, String context,
-            String metricName, Number value) throws IOException{
+    private void emitAsSingle(String plugin, String context, String metricName,
+            Number value) throws IOException {
 
         String type = getType(context, metricName);
         if (type.equals("NONE")) {
@@ -302,7 +302,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
     }
 
     private void emitMetric(String plugin, String name, String type,
-            Number value) throws IOException{
+            Number value) throws IOException {
         ValueList vl = new ValueList();
 
         vl.setTime(System.currentTimeMillis());
@@ -334,9 +334,9 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
 
             // if values is empty, not sends.
-            if(values==null || values.isEmpty())
+            if (values == null || values.isEmpty())
                 continue;
-            
+
             boolean includeNull = false;
             for (int i = 0; i < values.size(); i++) {
                 if (values.get(i) == null) {
@@ -344,11 +344,11 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                     break;
                 }
             }
-            if(!typedbkey.equals("dfs_FSNamesystem"))
-                continue;
+
             if (includeNull) {
-                LOG.warn(" invalid(null) values found, skipping, plugin:" + plugin
-                        + ",typedbkey:" + typedbkey + ", values:" + values );
+                LOG.warn(" invalid(null) values found, skipping, plugin:"
+                        + plugin + ",typedbkey:" + typedbkey + ", values:"
+                        + values);
                 continue;
             }
 
@@ -358,17 +358,18 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             try {
                 sender.dispatch(vl);
                 sender.flush();
-                
-                LOG.info("sent consolidated: typedbkey:" + typedbkey
-                        + ",vl:" + vl);
+
+                LOG.info("sent consolidated: typedbkey:" + typedbkey + ",vl:"
+                        + vl);
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < elem.length; i++)
                     sb.append(elem[i] + "\n");
 
-                LOG.error("sending consolidated record failed:"+ e + ":plugin:" + plugin
-                        + ", typedbkey:" + typedbkey + ", vl:" + vl + ", trace:" + sb.toString());
+                LOG.error("sending consolidated record failed:" + e
+                        + ":plugin:" + plugin + ", typedbkey:" + typedbkey
+                        + ", vl:" + vl + ", trace:" + sb.toString());
             }
 
             vl.clearValues();
