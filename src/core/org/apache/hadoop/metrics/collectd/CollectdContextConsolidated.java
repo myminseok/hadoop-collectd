@@ -343,7 +343,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                     break;
                 }
             }
-            if(!typedbkeys.equals("dfs_FSNamesystem"))
+            if(!typedbkey.equals("dfs_FSNamesystem"))
                 continue;
             if (includeNull) {
                 LOG.warn(" invalid(null) values found, skipping, plugin:" + plugin
