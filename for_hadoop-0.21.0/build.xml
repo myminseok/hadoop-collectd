@@ -8,11 +8,14 @@
             location="../lib/commons-logging-1.1.1.jar"/>
   <property name="collectd.jar" 
             location="../lib/jcollectd.jar"/>
+  <property name="commons-vfs.jar" 
+		    location="../lib/commons-vfs-1.0.jar"/>
 
   <path id="hd.classpath"> 
     <path location="${hadoop.jar}"/> 
     <path location="${collectd.jar}"/> 
     <path location="${logging.jar}"/> 
+  	<path location="${commons-vfs.jar}"/> 
   </path> 
  
   <target name="init"> 

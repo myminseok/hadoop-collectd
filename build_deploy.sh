@@ -1,4 +1,4 @@
-git pull origin master
+#git pull origin master
 cd for_hadoop-0.20.2
 
 hadoop_home=/home/nexr/nexr_platforms/hadoop/hadoop

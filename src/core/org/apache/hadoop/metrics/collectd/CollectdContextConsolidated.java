@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -29,21 +31,29 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.vfs.FileChangeEvent;
+import org.apache.commons.vfs.FileListener;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs.impl.DefaultFileMonitor;
 import org.apache.hadoop.metrics.ContextFactory;
 import org.apache.hadoop.metrics.MetricsException;
 import org.apache.hadoop.metrics.spi.AbstractMetricsContext;
 import org.apache.hadoop.metrics.spi.OutputRecord;
 import org.apache.hadoop.metrics.spi.Util;
+import org.collectd.api.ValueList;
 import org.collectd.protocol.Network;
 import org.collectd.protocol.UdpSender;
-import org.collectd.api.ValueList;
 
 /**
  * modified from CollectdContext.java Context for sending metrics to collectd.
+ * if 'hadoop-metrics.properties' is updated, then this class updates 'xx-servers' property at runtime.
  */
-public class CollectdContextConsolidated extends AbstractMetricsContext {
-    private static final Log LOG = LogFactory
-            .getLog(CollectdContextConsolidated.class);
+public class CollectdContextConsolidated extends AbstractMetricsContext implements FileListener {
+    private static final Log LOG = LogFactory.getLog(CollectdContextConsolidated.class);
+
+    private static final String PROPERTIES_FILE = "/hadoop-metrics.properties";
 
     static final String PLUGIN = "hadoop";
     private static final String PERIOD_PROPERTY = "period";
@@ -58,12 +68,14 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     private Map<String, List<Number>> collectdRecordsToSend = new Hashtable<String, List<Number>>();
 
+    
+    
+    
+    
     private Properties loadTypes(String file) throws Exception {
 
         InputStream is = getClass().getClassLoader().getResourceAsStream(file);
-
         Properties typesLocal = new Properties();
-
         if (is != null) {
             try {
                 typesLocal.load(is);
@@ -88,8 +100,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
      * 
      * @throws Exception
      */
-    private Map<String, List<String>> loadTypesConsolidated(String file)
-            throws Exception {
+    private Map<String, List<String>> loadTypesConsolidated(String file) throws Exception {
         final Properties propsTypesConsolidated = this.loadTypes(file);
 
         Iterator<Object> keys = propsTypesConsolidated.keySet().iterator();
@@ -102,34 +113,16 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             String[] typelist = value.split(",");
             List<String> list = new ArrayList<String>();
             for (int i = 0; i < typelist.length; i++) {
-                // list.add(typelist[i].trim());
                 list.add(typelist[i].split(":")[0].trim());
             }
 
             typesConsolidatedLocal.put(key, list);
         }
 
-        LOG.info("# typesConsolidatedLocal:" + file + ":"
-                + typesConsolidatedLocal);
+        LOG.info("# typesConsolidatedLocal:" + file + ":" + typesConsolidatedLocal);
         return typesConsolidatedLocal;
 
     }
-
-    // private void initCollectdRecordsToSend() throws Exception {
-    //
-    // Iterator<String> keys = typesConsolidated.keySet().iterator();
-    // while (keys.hasNext()) {
-    // String tydbkey = keys.next().toString();
-    //
-    // List<String> tydbvalues = typesConsolidated.get(tydbkey);
-    // List<Number> values = new ArrayList<Number>(tydbvalues.size());
-    // for (int i = 0; i < tydbvalues.size(); i++) {
-    // values.add(null);
-    // }
-    // this.collectdRecordsToSend.put(tydbkey, values);
-    // }
-    //
-    // }
 
     private List<Number> initSingleCollectdRecordToSend(String typedbkey) {
         List<String> tydbvalues = typesConsolidated.get(typedbkey);
@@ -142,9 +135,22 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
+    
+    
+    
     public void init(String contextName, ContextFactory factory) {
         super.init(contextName, factory);
-
+        
+        this._init();
+        this.startMonitoringPropertyUpdate();
+        instance = defaultInstance();
+    }
+    
+    
+    
+    private void _init(){
+        
+        
         String periodStr = getAttribute(PERIOD_PROPERTY);
         if (periodStr != null) {
             int period = 0;
@@ -156,11 +162,13 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 throw new MetricsException("Invalid period: " + periodStr);
             }
             setPeriod(period);
-
+            
             try {
+            
+                LOG.info("initializing from hadoop-collectd-types.properties");
                 this.types = this.loadTypes("hadoop-collectd-types.properties");
-                this.typesConsolidated = this
-                        .loadTypesConsolidated("META-INF/types.db");
+                LOG.info("initializing from META-INF/types.db");
+                this.typesConsolidated = this.loadTypesConsolidated("META-INF/types.db");
 
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
@@ -174,17 +182,110 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
         }
 
-        sender = new UdpSender();
-        List<InetSocketAddress> metricsServers = Util.parse(
-                getAttribute(SERVERS_PROPERTY), Network.DEFAULT_PORT);
 
-        for (InetSocketAddress addr : metricsServers) {
-            sender.addServer(addr);
+//        sender = new UdpSender();
+//        List<InetSocketAddress> metricsServers = Util.parse(getAttribute(SERVERS_PROPERTY),
+//                Network.DEFAULT_PORT);
+//
+//        for (InetSocketAddress addr : metricsServers) {
+//            sender.addServer(addr);
+//        }
+
+        this.reloadUdpSenderProperty();
+        
+    }
+    
+    
+    
+    
+    
+
+    private void startMonitoringPropertyUpdate(){
+        try {
+            FileSystemManager fsManager = VFS.getManager();
+            URL prop = getClass().getResource(this.PROPERTIES_FILE);
+            String path = prop.getPath();
+            FileObject listendir = fsManager.resolveFile(path);
+            
+            DefaultFileMonitor fm = new DefaultFileMonitor(this);
+            fm.setRecursive(true);
+            fm.addFile(listendir);
+            fm.start();
+            
+            LOG.info("property file monitoring started... "+path);
+        } catch (Exception e) {
+            StackTraceElement[] elem = e.getStackTrace();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < elem.length; i++)
+                sb.append(elem[i] + "\n");
+
+            LOG.error("property file monitoring failed : " + e + " " + sb.toString());
+
+        }
+    }
+    private void reloadUdpSenderProperty() {
+        
+        LOG.info("loading servers propreties:"+this.PROPERTIES_FILE);
+        String newServers = this.getServersAttributes();
+
+        if (newServers != null) {
+
+            sender = new UdpSender();
+            List<InetSocketAddress> metricsServers = Util.parse(newServers, Network.DEFAULT_PORT);
+
+            for (InetSocketAddress addr : metricsServers) {
+                sender.addServer(addr);
+            }
+
+            LOG.info("loading servers done:" + newServers);
+
         }
 
-        instance = defaultInstance();
     }
 
+    private String getServersAttributes() {
+        Map<String, Object> attributeMap = this.loadProperties();
+        String key = this.getContextName() + "." + this.SERVERS_PROPERTY;
+        if (attributeMap.containsKey(key)) {
+            return attributeMap.get(key).toString();
+        } else
+            return null;
+
+    }
+
+    private Map<String, Object> loadProperties() {
+        Map<String, Object> attributeMap = new HashMap<String, Object>();
+        try {
+
+            
+            InputStream is = getClass().getResourceAsStream(PROPERTIES_FILE);
+            
+            if (is != null) {
+                Properties properties = new Properties();
+                properties.load(is);
+                Iterator it = properties.keySet().iterator();
+                while (it.hasNext()) {
+                    String propertyName = (String) it.next();
+                    String propertyValue = properties.getProperty(propertyName);
+
+                    attributeMap.put(propertyName, propertyValue);
+                }
+            }
+
+        } catch (IOException e) {
+            StackTraceElement[] elem = e.getStackTrace();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < elem.length; i++)
+                sb.append(elem[i] + "\n");
+
+            LOG.error("Loading  failed : " + e + " " + sb.toString());
+
+        }
+        return attributeMap;
+
+    }
+
+    
     private String defaultInstance() {
         // -Dhadoop.log.file=logs/hadoop-user-tasktracker-hostname.out
         String name = System.getProperty("hadoop.log.file");
@@ -204,8 +305,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
      * @param recordName FSNamesystem, namenode, datanode, metrics, jobtracker, datatracker, shuffleOutput
      * 
      */
-    protected void emitRecord(String contextName, String recordName,
-            OutputRecord outRec) throws IOException {
+    protected void emitRecord(String contextName, String recordName, OutputRecord outRec)
+            throws IOException {
 
         String context = contextName + "-" + recordName; // dfs-FSNamesystem
         String typedbkey = contextName + "_" + recordName; // dfs_FSNamesystem
@@ -215,8 +316,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             // this.initCollectdRecordsToSend();
             for (String metricName : outRec.getMetricNames()) {
                 Number value = outRec.getMetric(metricName);
-                if (!this.accumulateAsConsolidated(typedbkey, contextName,
-                        recordName, metricName, value)) {
+                if (!this.accumulateAsConsolidated(typedbkey, contextName, recordName, metricName,
+                        value)) {
                     this.emitAsSingle(plugin, context, metricName, value);
                 }
             }
@@ -237,17 +338,14 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             for (int i = 0; i < elem.length; i++)
                 sb.append(elem[i] + "\n");
 
-            LOG.error("consolidated Record  failed : " + e + " "
-                    + sb.toString());
+            LOG.error("consolidated Record  failed : " + e + " " + sb.toString());
         }
     }
 
-    private boolean accumulateAsConsolidated(String typedbkey,
-            String contextName, String recordName, String metricName,
-            Number value) {
+    private boolean accumulateAsConsolidated(String typedbkey, String contextName,
+            String recordName, String metricName, Number value) {
 
-        int consolidatedTypeIndex = this.lookupIndexFromTypeConsolidated(
-                typedbkey, metricName);
+        int consolidatedTypeIndex = this.lookupIndexFromTypeConsolidated(typedbkey, metricName);
 
         if (consolidatedTypeIndex >= 0) {
             List<Number> values = this.collectdRecordsToSend.get(typedbkey);
@@ -270,14 +368,12 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
      * @param metricName
      * @return
      */
-    private int lookupIndexFromTypeConsolidated(String typedbKey,
-            String metricName) {
+    private int lookupIndexFromTypeConsolidated(String typedbKey, String metricName) {
 
         int indexOfName = -1;
         if (this.typesConsolidated.containsKey(typedbKey)) {
 
-            List<String> result = (List<String>) this.typesConsolidated
-                    .get(typedbKey);
+            List<String> result = (List<String>) this.typesConsolidated.get(typedbKey);
             indexOfName = result.indexOf(metricName);
 
         }
@@ -286,8 +382,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
 
     }
 
-    private void emitAsSingle(String plugin, String context, String metricName,
-            Number value) throws IOException {
+    private void emitAsSingle(String plugin, String context, String metricName, Number value)
+            throws IOException {
 
         String type = getType(context, metricName);
         if (type.equals("NONE")) {
@@ -301,8 +397,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         return types.getProperty(context + "-" + name, DEFAULT_TYPE);
     }
 
-    private void emitMetric(String plugin, String name, String type,
-            Number value) throws IOException {
+    private void emitMetric(String plugin, String name, String type, Number value)
+            throws IOException {
         ValueList vl = new ValueList();
 
         vl.setTime(System.currentTimeMillis());
@@ -326,8 +422,7 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
         vl.setPluginInstance(instance);// namenode, secondarynamenode, datanode, jobtracker.
                                        // tasktracker.
 
-        Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet()
-                .iterator();
+        Iterator<String> typedbkeys = this.collectdRecordsToSend.keySet().iterator();
         String typedbkey = null;
         while (typedbkeys.hasNext()) {
             typedbkey = typedbkeys.next().toString();
@@ -346,9 +441,8 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
             }
 
             if (includeNull) {
-                LOG.warn(" invalid(null) values found, skipping, plugin:"
-                        + plugin + ",typedbkey:" + typedbkey + ", values:"
-                        + values);
+                LOG.warn(" invalid(null) values found, skipping, plugin:" + plugin + ",typedbkey:"
+                        + typedbkey + ", values:" + values);
                 continue;
             }
 
@@ -359,21 +453,39 @@ public class CollectdContextConsolidated extends AbstractMetricsContext {
                 sender.dispatch(vl);
                 sender.flush();
 
-                LOG.info("sent consolidated: typedbkey:" + typedbkey + ",vl:"
-                        + vl);
+                if(LOG.isDebugEnabled()){
+                    LOG.debug("sent consolidated: typedbkey:" + typedbkey + ",vl:" + vl);
+                }
             } catch (Exception e) {
                 StackTraceElement[] elem = e.getStackTrace();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < elem.length; i++)
                     sb.append(elem[i] + "\n");
 
-                LOG.error("sending consolidated record failed:" + e
-                        + ":plugin:" + plugin + ", typedbkey:" + typedbkey
-                        + ", vl:" + vl + ", trace:" + sb.toString());
+                LOG.error("sending consolidated record failed:" + e + ":plugin:" + plugin
+                        + ", typedbkey:" + typedbkey + ", vl:" + vl + ", trace:" + sb.toString());
             }
 
             vl.clearValues();
 
         }
+    }
+
+    @Override
+    public void fileChanged(FileChangeEvent event) throws Exception {
+
+        this._init();
+    }
+
+    @Override
+    public void fileCreated(FileChangeEvent arg0) throws Exception {
+        this._init();
+
+    }
+
+    @Override
+    public void fileDeleted(FileChangeEvent arg0) throws Exception {
+        // to nothing
+
     }
 }
