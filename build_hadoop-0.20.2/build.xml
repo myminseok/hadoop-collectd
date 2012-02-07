@@ -1,0 +1,55 @@
+<project name="hadoop-collectd" default="dist" basedir="."> 
+  <property file="${user.home}/hadoop-collectd-build.properties"/>
+  <property environment="env"/> 
+
+  <property name="hadoop.jar" 
+            location="../lib/hadoop-common-0.21.0.jar"/>
+  <property name="logging.jar" 
+            location="../lib/commons-logging-1.1.1.jar"/>
+  <property name="collectd.jar" 
+            location="../lib/jcollectd.jar"/>
+ <property name="commons-vfs.jar" 
+	            location="../lib/commons-vfs-1.0.jar"/>
+
+  <path id="hd.classpath"> 
+    <path location="${hadoop.jar}"/> 
+    <path location="${collectd.jar}"/> 
+    <path location="${logging.jar}"/> 
+  	<path location="${commons-vfs.jar}"/> 
+  </path> 
+ 
+  <target name="init"> 
+    <mkdir dir="build/classes"/> 
+  </target> 
+ 
+  <target name="compile" depends="init"> 
+    <javac srcdir="../src/core"  
+           destdir="build/classes"  
+           debug="true" 
+           source="1.6" 
+           target="1.6" 
+           classpathref="hd.classpath"/> 
+  </target> 
+ 
+  <target name="dist" depends="compile"> 
+  	
+  	<mkdir dir="build/classes/META-INF" />
+  	<copy file="types.db"
+  	          tofile="build/classes/META-INF/types.db" />
+  	
+  	
+    <jar jarfile="build/hadoop-collectd-0.20.2.jar">
+      <fileset dir="." includes="*.properties"/>
+      <fileset dir="." includes="*.properties"/>
+      <fileset dir="build/classes" includes="**/*.class,**/META-INF/*"> 
+        <exclude name="**/test/*"/> 
+      </fileset> 
+      
+    	 
+    </jar> 
+  </target> 
+  
+  <target name="clean"> 
+    <delete dir="build"/> 
+  </target> 
+</project>

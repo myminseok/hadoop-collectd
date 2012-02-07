@@ -1,0 +1,81 @@
+##################################################################################################
+hadoop collectd plugin to collect hadoop metrics into remote collectd server
+@ author james.kim 2012.2.7
+
+
+this plugin( CollectdContextConsolidated.java ) is developed on the basis of CollectdContext.( see README.markdown)
+and supports only for hadoop 0.20.2 or hadoop 0.21.0
+this plugins collects metrics specified  in 'hadoop-collectd-types.properties', 'types.db' files that are packaged with 'hadoop-collectd.jar'
+
+difference from previous "CollectdContext" is that
+ - collects metrics which are specified in separated properties
+ - collects several metrics into a group. it reduces network packet size and incleases IO performance in collectd server side. 
+ - if it is required to change collectd server's ip in hadoop-collectd plugin during runtime,
+   simply edit $hadoop/conf/hadoop-metric.properties files then hadoop-collectd.jar will immediately apply it.
+   
+### build this plugin, 
+   1) prepare systems with,
+      apache ant 
+      jvm 1.6.x or higher
+
+   2) build for hadoop 0.20.2,
+   
+    cd ./build_hadoop-0.20.2 
+    ant
+   
+   during ant task, following occurs.  
+   - source compiled and packaged into jar.
+   - current folder's 'types.db', and 'hadoop-collectd-types.properties'files are packaged into hadoop-collectd.jar
+
+### Deploy and Configuration        
+   3) place jar into hadoop folder
+   after successful ant build copy following jar files into hadoop folders
+	- ./build/hadoop-collectd-0.20.2.jar =>  $hadoop/lib folder.
+	    (remove all previous $hadoop/lib/hadoop-collectd*.jar)
+	- ../lib/commons-vfs-1.0.jar =>  $hadoop/lib folder.
+	- ../lib/commons-vfs-1.0.jar =>  $hadoop/lib folder.
+	    ( if $hadoop/lib/commons-logging*.jar not exists)
+
+   4) edit $hadoop/conf/hadoop-metric.properties as following.
+    ( there is sample file under ./hadoop_conf_sample/ folder.)
+    (  $COLLECTD_SERVER_IP should be replaced with real collectd server ip )
+   	# Configuration of the "dfs" context for collectd
+	dfs.class=org.apache.hadoop.metrics.collectd.CollectdContextConsolidated
+	dfs.period=5
+	dfs.servers=$COLLECTD_SERVER_IP:25826
+	 
+	# Configuration of the "mapred" context for collectd
+	mapred.class=org.apache.hadoop.metrics.collectd.CollectdContextConsolidated
+	mapred.period=5
+	mapred.servers=$COLLECTD_SERVER_IP:25826
+	 
+	# Configuration of the "jvm" context for collectd
+	jvm.class=org.apache.hadoop.metrics.collectd.CollectdContextConsolidated
+	jvm.period=5
+	jvm.servers=$COLLECTD_SERVER_IP:25826
+   
+   5) restart hadoop
+      $hadoop/bin/start-all.sh
+
+   6) configure collectd server
+      append 'types.db_copy_to_collectd' contents into $collectd_server/share/collectd/types.db
+      restart collectd
+      
+### trouble shooting
+   configureation information and error log will log into $hadoop/logs/*.out
+   successfully operation  will leaves no log.
+   even though collectd ip or port is invalid, this plugin doesn't know because it uses UDP socket.
+   check collectd server's log or rrdfile to see errors on collectd server's side.
+   
+               
+### Links
+[hadoop](http://hadoop.apache.org/core/) - Hadoop project
+
+[hadoop-collectd](http://github.com/hyperic/hadoop-collectd) - git repo
+
+[collectd](http://collectd.org) - the system statistics collection daemon
+
+[jcollectd](http://support.hyperic.com/display/hypcomm/jcollectd) - Java integration for collectd
+
+[commons vfs](http://commons.apache.org/vfs/) - apache commons vfs project		
+	
